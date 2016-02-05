@@ -1,0 +1,87 @@
+package ${meta.controllerPackageName};
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.propertyeditors.CustomDateEditor;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import ${meta.domainPackageName}.${meta.domainClassName};
+import ${meta.apiPackageName}.${meta.serviceClassName};
+import ${meta.voPackageName}.${meta.voClassName};
+
+/**
+ * @description 
+ * @author wangming
+ */
+@Controller
+@RequestMapping(value = "/invest/${meta.l_domainClassName}")
+public class ${meta.controllerClassName} {
+
+	@Autowired
+	private ${meta.serviceClassName} ${meta.l_serviceClassName};
+	
+	@InitBinder  
+	public void initBinder(WebDataBinder binder) throws Exception {  
+	     DateFormat df = new SimpleDateFormat("yyyy-MM-dd");  
+	     binder.registerCustomEditor(Date.class, null, new CustomDateEditor(df,  
+	                true));  
+	}
+	
+	
+	@RequestMapping(value="/list")
+	public ModelAndView list(${meta.domainClassName} vo){
+		ModelAndView mv=new ModelAndView("tzxm/${meta.domainClassName.toLowerCase()}/${meta.domainClassName.toLowerCase()}List");
+		List<HashMap<String, Object>> queryList=${meta.l_serviceClassName}.selectByExample(vo);
+		mv.addObject("list", queryList).addObject("vo", vo);
+		return mv;
+	}
+	
+	@RequestMapping(value="toAdd", method = RequestMethod.GET)
+	public ModelAndView toAdd(){
+		ModelAndView mv=new ModelAndView("tzxm/${meta.domainClassName.toLowerCase()}/${meta.domainClassName.toLowerCase()}Add");
+		mv.addObject("action","add").addObject("title","新增XXXXXXXX");
+		return mv;
+	}
+	
+	@RequestMapping(value="add", method = RequestMethod.POST)
+	public String add(${meta.domainClassName} entity,RedirectAttributes redirectAttributes){
+		${meta.l_serviceClassName}.insert(entity);
+		redirectAttributes.addFlashAttribute("message","更新成功");
+		return "redirect:/invest/${meta.l_domainClassName}/list";
+	}
+	
+	@RequestMapping(value="toEdit", method = RequestMethod.GET)
+	public ModelAndView toEdit(String id){
+		ModelAndView mv=new ModelAndView("tzxm/${meta.domainClassName.toLowerCase()}/${meta.domainClassName.toLowerCase()}Add");
+		${meta.domainClassName} entity =${meta.l_serviceClassName}.selectByPrimaryKey(id);
+		mv.addObject("action","edit").addObject("title","XXXXXXX修改").addObject("model", entity);
+		return mv;
+	}
+	
+	@RequestMapping(value="edit", method = RequestMethod.POST)
+	public String edit(${meta.domainClassName} entity,RedirectAttributes redirectAttributes){
+		${meta.l_serviceClassName}.updateByPrimaryKey(entity);
+		redirectAttributes.addFlashAttribute("message","更新成功");
+		return "redirect:/invest/${meta.l_domainClassName}/list";
+	}
+	
+	@RequestMapping(value="del", method = RequestMethod.POST)
+	public String del(String ids,String pIds,RedirectAttributes remodel){
+		//remodel.addFlashAttribute("message",${meta.l_serviceClassName}.deleteByIds(ids,pIds));
+		return "redirect:/invest/${meta.l_domainClassName}/list";
+	}
+	
+	
+}

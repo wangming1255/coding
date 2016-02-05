@@ -1,0 +1,30 @@
+package ${meta.mapperInterfacePackageName};
+
+import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.List;
+
+import com.fairyland.jdp.orm.mybatis.pagination.annotation.MyBatisRepository;
+
+
+import ${meta.domainPackageName}.${meta.domainClassName};
+
+/**
+ * @description dao层接口
+ * @author wangming
+ */
+@MyBatisRepository
+public interface ${meta.mapperInterfaceClassName} {
+	/**根据主键查询*/
+	${meta.domainClassName} selectByPrimaryKey(BigDecimal id);
+	/**根据例子查询*/
+	List<HashMap<String, Object>> selectByExample(${meta.domainClassName} vo);
+	/**插入一条新的记录*/
+    int insert(${meta.domainClassName} record);
+    /**更新一条记录*/
+    int update(${meta.domainClassName} record);
+    /**删除一条记录*/
+    int deleteByPrimaryKey(BigDecimal id);
+     /**批量删除*/
+	int deleteByIds(List list);
+ }

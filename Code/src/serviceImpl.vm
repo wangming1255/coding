@@ -1,0 +1,51 @@
+package ${meta.servicePackageName}.impl;
+
+import java.util.HashMap;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import ${meta.apiPackageName}.${meta.serviceClassName};
+import ${meta.domainPackageName}.${meta.domainClassName};
+import ${meta.mapperInterfacePackageName}.${meta.mapperInterfaceClassName};
+
+@Service
+@Transactional
+public class ${meta.serviceClassName}Impl implements ${meta.serviceClassName}{
+	@Autowired
+	private ${meta.mapperInterfaceClassName} _${meta.mapperInterfaceClassName};
+	
+	
+	@Override
+	public List<HashMap<String, Object>> selectByExample(${meta.domainClassName} vo) {
+		return _${meta.mapperInterfaceClassName}.selectByExample(vo);
+	}
+
+
+	@Override
+	public ${meta.domainClassName} selectByPrimaryKey(String id) {
+		return _${meta.mapperInterfaceClassName}.selectByPrimaryKey(new BigDecimal(id));
+	}
+
+	@Override
+	public void updateByPrimaryKey(${meta.domainClassName} vo)  {
+		if(vo.getId()==null){
+			//throw new Exception("");
+			System.err.println("更新错误，无主键id");
+		}
+		_${meta.mapperInterfaceClassName}.update(vo);
+	}
+
+	@Override
+	public void insert(${meta.domainClassName} vo) {
+		_${meta.mapperInterfaceClassName}.insert(vo);
+	}
+	
+	@Override
+	public void deleteByIds(String ids){
+		List list=Arrays.asList(ids.split(","));
+		_${meta.mapperInterfaceClassName}.deleteByIds(list);
+	}
+}

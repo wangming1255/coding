@@ -1,0 +1,26 @@
+package ${meta.domainPackageName};
+
+/**
+ *@Description: ${meta.tableDesc}  实体类 
+ *				${meta.tableName}
+ *@Author:wangming
+ */
+public class ${meta.domainClassName} {
+
+	
+	#foreach( ${col} in ${meta.cols} )
+private ${col.colType} ${col.fieldName};  //${col.colDesc}
+	
+	#end
+#foreach( ${col} in ${meta.cols} )
+public void ${col.seOperName}(${col.colType} ${col.fieldName}){
+		this.${col.fieldName}=${col.fieldName};
+	}
+	
+	public ${col.colType} ${col.geOperName}(){
+		return this.${col.fieldName};
+	}
+	
+	#end
+	
+}

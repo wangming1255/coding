@@ -1,0 +1,11 @@
+package ${meta.voPackageName};
+
+import ${meta.domainPackageName}.${meta.domainClassName};
+
+/**
+ *VO，用于查询或传递信息
+ */
+public class ${meta.voClassName} extends ${meta.domainClassName} {
+
+	
+}

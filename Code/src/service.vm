@@ -1,0 +1,29 @@
+package ${meta.apiPackageName};
+
+import java.util.HashMap;
+import java.util.List;
+
+import ${meta.domainPackageName}.${meta.domainClassName};
+
+/**
+ *@Description：${meta.tableDesc} Servcie
+ *@Author：wangming
+ */
+public interface ${meta.serviceClassName} {
+	
+	/**按条件查询*/	
+	public List<HashMap<String, Object>> selectByExample(${meta.domainClassName} vo);
+	
+	/**按主键查询*/
+	public ${meta.domainClassName} selectByPrimaryKey(String id);
+	
+	/**更新一条记录*/
+	public void updateByPrimaryKey(${meta.domainClassName} vo);
+	
+	/**插入一条记录*/
+	public void insert(${meta.domainClassName} vo);
+	
+	/**批量删除*/
+	public void deleteByIds(String ids);
+	
+}
