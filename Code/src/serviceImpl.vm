@@ -1,5 +1,6 @@
 package ${meta.servicePackageName}.impl;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -7,45 +8,86 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import ${meta.apiPackageName}.${meta.serviceClassName};
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import ${meta.servicePackageName}.${meta.serviceClassName};
 import ${meta.domainPackageName}.${meta.domainClassName};
 import ${meta.mapperInterfacePackageName}.${meta.mapperInterfaceClassName};
+import com.tzxm.mybatis.Page;
+import com.tzxm.mybatis.PageHelper;
+import com.tzxm.sys.codeMaster.service.CodeMasterService;
 
+/**
+ *@Description：${meta.tableDesc} -- Servcie实现类
+ *@Author：${meta.user}
+ *@email：${meta.email}
+ *@Date:${meta.date}
+ */
 @Service
 @Transactional
 public class ${meta.serviceClassName}Impl implements ${meta.serviceClassName}{
+
+ 	private static final Logger logger = LoggerFactory.getLogger(${meta.serviceClassName}Impl.class);
+ 	
 	@Autowired
-	private ${meta.mapperInterfaceClassName} _${meta.mapperInterfaceClassName};
+	private ${meta.mapperInterfaceClassName} _${meta.mapperInterfaceClassName};//${meta.tableDesc}
 	
+	@Autowired
+	private CodeMasterService codeMasterService;//取主键用
 	
 	@Override
 	public List<HashMap<String, Object>> selectByExample(${meta.domainClassName} vo) {
 		return _${meta.mapperInterfaceClassName}.selectByExample(vo);
 	}
 
-
 	@Override
-	public ${meta.domainClassName} selectByPrimaryKey(String id) {
-		return _${meta.mapperInterfaceClassName}.selectByPrimaryKey(new BigDecimal(id));
+	public List<${meta.domainClassName}> selectModelByExample(${meta.domainClassName} vo) {
+		return _${meta.mapperInterfaceClassName}.selectModelByExample(vo);
 	}
-
+	
+		
+	@SuppressWarnings("unchecked")
 	@Override
-	public void updateByPrimaryKey(${meta.domainClassName} vo)  {
-		if(vo.getId()==null){
-			//throw new Exception("");
-			System.err.println("更新错误，无主键id");
-		}
-		_${meta.mapperInterfaceClassName}.update(vo);
-	}
-
-	@Override
-	public void insert(${meta.domainClassName} vo) {
-		_${meta.mapperInterfaceClassName}.insert(vo);
+	public Page<HashMap<String, Object>> selectByPage(${meta.domainClassName} vo,
+			Page<HashMap<String, Object>> page) {
+		PageHelper.startPage(page.getPageNum(), page.getPageSize());
+		_${meta.mapperInterfaceClassName}.selectByExample(vo);
+		return PageHelper.endPage();
 	}
 	
 	@Override
-	public void deleteByIds(String ids){
-		List list=Arrays.asList(ids.split(","));
-		_${meta.mapperInterfaceClassName}.deleteByIds(list);
+	public ${meta.domainClassName} selectByPrimaryKey(Long id) {
+		return _${meta.mapperInterfaceClassName}.selectByPrimaryKey(id);
 	}
+
+	@Override
+	public ${meta.domainClassName} updateByPrimaryKey(${meta.domainClassName} vo)  {
+		if(vo.getId()==null){
+			logger.error("更新错误，无主键id");
+		}
+		_${meta.mapperInterfaceClassName}.update(vo);
+		return vo;
+	}
+
+	@Override
+	public ${meta.domainClassName} insert(${meta.domainClassName} vo) {
+		String idStr=codeMasterService.gnrtCode(vo.getClass().getSimpleName());
+		vo.setId(new Long(idStr));
+		_${meta.mapperInterfaceClassName}.insert(vo);
+		return vo;
+	}
+	
+	@SuppressWarnings("rawtypes")
+	@Override
+	public int deleteByIds(String ids){
+		List list=Arrays.asList(ids.split(","));
+		return  _${meta.mapperInterfaceClassName}.deleteByIds(list);
+	}
+	
+	@Override
+	public int deleteByPrimaryKey(Long id){
+		return  _${meta.mapperInterfaceClassName}.deleteByPrimaryKey(id);
+	}
+	
 }

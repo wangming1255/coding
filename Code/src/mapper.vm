@@ -2,9 +2,19 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
+<!--${meta.user}：${meta.email}-->
 <mapper namespace="${meta.mapperInterfacePackageName}.${meta.mapperInterfaceClassName}">
 	
-	<sql id="Base_Column_List" >
+	
+	<sql id="mapSQL" >
+		#set($temp=0) 
+		#foreach( ${col} in ${meta.cols} )
+		#if( $temp >0 ) , #end  ${col.colName} as "${col.fieldName}" 
+		#set($temp=$temp+1)
+		#end
+  	</sql>
+  	
+	<sql id="objectSQL" >
 		#set($temp=0) 
 		#foreach( ${col} in ${meta.cols} )
 		#if( $temp >0 ) , #end  ${col.colName} as "${col.fieldName}" 
@@ -12,11 +22,11 @@
 		#end
   	</sql>
 	
-	<select id="selectByPrimaryKey" resultType="${meta.domainPackageName}.${meta.domainClassName}" parameterType="java.math.BigDecimal" >
-    	select 
-    	<include refid="Base_Column_List" />
-    	from ${meta.tableName}
-   		 where 
+	<select id="selectByPrimaryKey" resultType="${meta.domainPackageName}.${meta.domainClassName}" parameterType="java.lang.Long" >
+    	SELECT 
+    	<include refid="mapSQL" />
+    	FROM ${meta.tableName}
+   		 WHERE 
 		#set($temp=0)
 		#foreach( ${col} in ${meta.cols} )
 		#if($col.isPkFlag())
@@ -26,19 +36,30 @@
 		#end
   </select>
   
-   <select id="selectByExample" resultType="java.util.HashMap" parameterType="${meta.domainPackageName}.${meta.domainClassName}" >
-    select 
-    <include refid="Base_Column_List" />
-    from ${meta.tableName}
+   <select id="selectModelByExample" resultType="${meta.domainPackageName}.${meta.domainClassName}" parameterType="${meta.domainPackageName}.${meta.domainClassName}" >
+    SELECT 
+    <include refid="objectSQL" />
+    FROM ${meta.tableName}
     <where>
-    	 #foreach( ${col} in ${meta.cols} )<if test="${col.fieldName}!=null">and  ${col.colName}=#{${col.fieldName}}</if>
+    	 #foreach( ${col} in ${meta.cols} )<if test="${col.fieldName}!=null">AND  ${col.colName} = #{${col.fieldName}}</if>
 		#end
     </where>
   </select>
   
-  <delete id="deleteByPrimaryKey" parameterType="java.math.BigDecimal" >
-    delete from ${meta.tableName}
-    where #set($temp=0)
+  <select id="selectByExample" resultType="java.util.HashMap" parameterType="${meta.domainPackageName}.${meta.domainClassName}" >
+    SELECT 
+    <include refid="mapSQL" />
+    FROM ${meta.tableName}
+    <where>
+    	 #foreach( ${col} in ${meta.cols} )<if test="${col.fieldName}!=null">AND  ${col.colName} = #{${col.fieldName}}</if>
+		#end
+    </where>
+  </select>
+  
+  
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    DELETE FROM ${meta.tableName}
+    WHERE #set($temp=0)
 		#foreach( ${col} in ${meta.cols} )
 		#if($col.isPkFlag())
 		#if( $temp >0 ) and #end ${col.colName}=#{${col.fieldName}} 
@@ -49,7 +70,7 @@
   
   
   <insert id="insert" parameterType="${meta.domainPackageName}.${meta.domainClassName}" >
-    insert into ${meta.tableName}
+    INSERT INTO ${meta.tableName}
     <trim prefix="(" suffix=")" suffixOverrides="," >
     	
     	#foreach( ${col} in ${meta.cols} )
@@ -64,13 +85,13 @@
   </insert>
   
    <update id="update" parameterType="${meta.domainPackageName}.${meta.domainClassName}" >
-    update ${meta.tableName}
+    UPDATE ${meta.tableName}
     <set >
     	#foreach( ${col} in ${meta.cols} )
-    	<if test="${col.fieldName} != null" >${col.colName} =#{${col.fieldName}},</if>
+    	<if test="${col.fieldName} != null" >${col.colName} = #{${col.fieldName}},</if>
 		#end
     </set>
-    where #set($temp=0)
+    WHERE #set($temp=0)
 		#foreach( ${col} in ${meta.cols} )
 		#if($col.isPkFlag())
 		#if( $temp >0 ) and #end ${col.colName}=#{${col.fieldName}} 
@@ -81,7 +102,7 @@
   
   
   <delete id="deleteByIds" parameterType="java.math.BigDecimal">
-		delete from ${meta.tableName} t where 
+		DELETE FROM ${meta.tableName} t WHERE 
 		#set($temp=0)
 		#foreach( ${col} in ${meta.cols} )
 		#if($col.isPkFlag())
@@ -95,5 +116,42 @@
             #{item}
          </foreach>
 	</delete>
+	
+	<insert id="insertModels" parameterType="java.util.List">
+		<foreach collection="list" item="item" index="index" open="begin"
+			close=";end;" separator=";">
+			INSERT INTO ${meta.tableName}
+			<trim prefix="(" suffix=")" suffixOverrides=",">
+				#foreach( ${col} in ${meta.cols} )
+    			<if test="item.${col.fieldName} != null" >${col.colName},</if>
+				#end
+			</trim>
+			<trim prefix="values (" suffix=")" suffixOverrides=",">
+				#foreach( ${col} in ${meta.cols} )
+    			<if test="item.${col.fieldName} != null" >#{item.${col.fieldName}},</if>
+				#end
+			</trim>
+		</foreach>
+	</insert>
+
+	<update id="updateModels" parameterType="java.util.List">
+		<foreach collection="list" item="item" index="index" open="begin"
+			close=";end;" separator=";">
+			UPDATE ${meta.tableName}
+		    <set >
+		    	#foreach( ${col} in ${meta.cols} )
+		    	<if test="item.${col.fieldName} != null" >${col.colName} = #{item.${col.fieldName}},</if>
+				#end
+		    </set>
+		    WHERE #set($temp=0)
+				#foreach( ${col} in ${meta.cols} )
+				#if($col.isPkFlag())
+				#if( $temp >0 ) and #end ${col.colName}=#{item.${col.fieldName}} 
+				#set($temp=$temp+1)
+				#end
+				#end
+		</foreach>
+	</update>
+	
 	
 </mapper>

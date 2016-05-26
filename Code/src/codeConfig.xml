@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<code>
+	<!-- 变量部分 -->
+	<variable>
+		<jdbc>
+			<driver>oracle.jdbc.driver.OracleDriver</driver>
+			<url>
+				<![CDATA[
+					jdbc:oracle:thin:@10.60.17.241:1521:dg1
+				]]>
+			</url>
+			<schema>TZXM</schema>
+			<user>tzxm</user>
+			<password>tzxm</password>
+			<remarksReporting>true</remarksReporting>
+		</jdbc>
+		<out>
+			<tables>
+				<table>TZ_FIX_TARGET_REDEEM</table>
+			</tables>
+			<commonPackage>stock</commonPackage>
+			<outPath>d://tmp/</outPath>
+		</out>
+	</variable>
+	<!-- 常量部分 -->
+	<constant>
+		<projectPackage>com.tzxm</projectPackage>
+		<user>wangming</user>
+		<email>w18855525068@163.com</email>
+		<!--模板 -->
+		<templates>
+			<!-- path是公共路径下的路径  file是文件名    里面的值是模板的名称 -->
+			<template path="domain" file=".java">domain.vm</template>
+			<template path="dao.mapper" file="Mapper.xml">mapper.vm</template>
+			<template path="dao" file="Mapper.java">mapperInterface.vm</template>
+			<template path="service" file="Service.java">service.vm</template>
+			<template path="service.impl" file="ServiceImpl.java">serviceImpl.vm</template>
+			<template path="vo" file="VO.java">vo.vm</template>
+			<template path="controller" file="Controller.java">controller.vm</template>
+		</templates>
+	</constant>
+</code>

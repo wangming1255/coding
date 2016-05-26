@@ -5,6 +5,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
@@ -17,20 +19,29 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.fairyland.jdp.core.web.MediaTypes;
 import ${meta.domainPackageName}.${meta.domainClassName};
-import ${meta.apiPackageName}.${meta.serviceClassName};
+import ${meta.servicePackageName}.${meta.serviceClassName};
 import ${meta.voPackageName}.${meta.voClassName};
+import com.tzxm.mybatis.Page;
+import com.tzxm.utils.JsonResult;
+
 
 /**
- * @description 
- * @author wangming
+ *@description ${meta.tableDesc} --控制器
+ *@Author：${meta.user}
+ *@email：${meta.email}
+ *@Date:${meta.date}
  */
 @Controller
-@RequestMapping(value = "/invest/${meta.l_domainClassName}")
+@RequestMapping(value = "/invest/${meta.commonName}/${meta.l_domainClassName}")
 public class ${meta.controllerClassName} {
+
+	private static final Logger logger = LoggerFactory.getLogger(${meta.controllerClassName}.class);
 
 	@Autowired
 	private ${meta.serviceClassName} ${meta.l_serviceClassName};
+	
 	
 	@InitBinder  
 	public void initBinder(WebDataBinder binder) throws Exception {  
@@ -39,48 +50,87 @@ public class ${meta.controllerClassName} {
 	                true));  
 	}
 	
-	
-	@RequestMapping(value="/list")
-	public ModelAndView list(${meta.domainClassName} vo){
-		ModelAndView mv=new ModelAndView("tzxm/${meta.domainClassName.toLowerCase()}/${meta.domainClassName.toLowerCase()}List");
-		List<HashMap<String, Object>> queryList=${meta.l_serviceClassName}.selectByExample(vo);
-		mv.addObject("list", queryList).addObject("vo", vo);
-		return mv;
+	/**列表查询*/
+	@RequestMapping(method = RequestMethod.GET)
+	public String list(){
+		return "tzxm/${meta.commonName}/${meta.l_domainClassName}List";
 	}
 	
-	@RequestMapping(value="toAdd", method = RequestMethod.GET)
+	/**分页数据*/
+	@RequestMapping(value="pageData")
+	public ModelAndView data(${meta.domainClassName} entity,Page<HashMap<String, Object>> page){
+		logger.warn(entity.toString());
+		page=${meta.l_serviceClassName}.selectByPage(entity,page);
+		return new ModelAndView("tzxm/${meta.commonName}/${meta.l_domainClassName}Data")
+				.addObject("page", page);
+	}
+	
+	
+	/**进入新增*/
+	@RequestMapping(value="add", method = RequestMethod.GET)
 	public ModelAndView toAdd(){
-		ModelAndView mv=new ModelAndView("tzxm/${meta.domainClassName.toLowerCase()}/${meta.domainClassName.toLowerCase()}Add");
-		mv.addObject("action","add").addObject("title","新增XXXXXXXX");
-		return mv;
+		return new ModelAndView("tzxm/${meta.commonName}/${meta.l_domainClassName}Add")
+				.addObject("action","add")
+				.addObject("title","新增${meta.tableDesc}");
 	}
 	
-	@RequestMapping(value="add", method = RequestMethod.POST)
-	public String add(${meta.domainClassName} entity,RedirectAttributes redirectAttributes){
-		${meta.l_serviceClassName}.insert(entity);
-		redirectAttributes.addFlashAttribute("message","更新成功");
-		return "redirect:/invest/${meta.l_domainClassName}/list";
+	/**新增*/
+	@RequestMapping(value="add", method = RequestMethod.POST,produces = MediaTypes.JSON_UTF_8)
+	@ResponseBody
+	public JsonResult add(${meta.domainClassName} entity){
+		logger.warn(entity.toString());
+		try {
+			${meta.l_serviceClassName}.insert(entity);
+		} catch (Exception e) {
+			throw new RuntimeException("保存失败");
+		}
+		return new JsonResult(true);
 	}
 	
-	@RequestMapping(value="toEdit", method = RequestMethod.GET)
-	public ModelAndView toEdit(String id){
-		ModelAndView mv=new ModelAndView("tzxm/${meta.domainClassName.toLowerCase()}/${meta.domainClassName.toLowerCase()}Add");
+	/**进入编辑*/
+	@RequestMapping(value="edit", method = RequestMethod.GET)
+	public ModelAndView toEdit(Long id){
 		${meta.domainClassName} entity =${meta.l_serviceClassName}.selectByPrimaryKey(id);
-		mv.addObject("action","edit").addObject("title","XXXXXXX修改").addObject("model", entity);
-		return mv;
+		if(entity==null){
+			throw new NullPointerException("没有找到指定的${meta.tableDesc}");
+		}
+		return new ModelAndView("tzxm/${meta.commonName}/${meta.l_domainClassName}Add")
+				.addObject("action","edit").addObject("title","${meta.tableDesc}修改").addObject("model", entity);
 	}
 	
-	@RequestMapping(value="edit", method = RequestMethod.POST)
-	public String edit(${meta.domainClassName} entity,RedirectAttributes redirectAttributes){
-		${meta.l_serviceClassName}.updateByPrimaryKey(entity);
-		redirectAttributes.addFlashAttribute("message","更新成功");
-		return "redirect:/invest/${meta.l_domainClassName}/list";
+	
+	/**编辑*/
+	@RequestMapping(value="edit", method = RequestMethod.POST,produces = MediaTypes.JSON_UTF_8)
+	@ResponseBody
+	public JsonResult edit(${meta.domainClassName} entity){
+		logger.warn(entity.toString());
+		try {
+			${meta.l_serviceClassName}.updateByPrimaryKey(entity);
+		} catch (Exception e) {
+			throw new RuntimeException("保存失败");
+		}
+		return new JsonResult(true);	
 	}
 	
+	/**进入查看*/
+	@RequestMapping(value="view", method = RequestMethod.GET)
+	public ModelAndView toView(Long id){
+		${meta.domainClassName} entity=${meta.l_serviceClassName}.selectByPrimaryKey(id);
+		if(entity==null){
+			throw new NullPointerException("没有找到指定的${meta.tableDesc}");
+		}
+		return new ModelAndView("tzxm/${meta.commonName}/${meta.l_domainClassName}View")
+			.addObject("title","${meta.tableDesc}查看")
+			.addObject("model", entity);
+	}
+	
+	
+	/**删除（批量删除）*/
 	@RequestMapping(value="del", method = RequestMethod.POST)
-	public String del(String ids,String pIds,RedirectAttributes remodel){
-		//remodel.addFlashAttribute("message",${meta.l_serviceClassName}.deleteByIds(ids,pIds));
-		return "redirect:/invest/${meta.l_domainClassName}/list";
+	public String del(String ids,RedirectAttributes remodel){
+		${meta.l_serviceClassName}.deleteByIds(ids);
+		remodel.addFlashAttribute("message","删除成功！");
+		return "redirect:/invest/${meta.commonName}/${meta.l_domainClassName}";
 	}
 	
 	

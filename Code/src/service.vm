@@ -1,29 +1,90 @@
-package ${meta.apiPackageName};
+package ${meta.servicePackageName};
 
 import java.util.HashMap;
 import java.util.List;
 
 import ${meta.domainPackageName}.${meta.domainClassName};
+import com.tzxm.mybatis.Page;
 
 /**
- *@Description：${meta.tableDesc} Servcie
- *@Author：wangming
+ *@Description：${meta.tableDesc} --Servcie
+ *@Author：${meta.user}
+ *@email：${meta.email}
+ *@Date:${meta.date}
  */
 public interface ${meta.serviceClassName} {
 	
-	/**按条件查询*/	
+	/**
+	 * @Description:按条件查询
+	 * @param vo 查询对象
+	 * @return map集合
+	 * @author:${meta.user}
+	 * @Date:${meta.date}
+	 */	
 	public List<HashMap<String, Object>> selectByExample(${meta.domainClassName} vo);
 	
-	/**按主键查询*/
-	public ${meta.domainClassName} selectByPrimaryKey(String id);
+	/**
+	 * @Description:按条件查询实体
+	 * @param vo 查询对象
+	 * @return 实体集合
+	 * @author:${meta.user}
+	 * @Date:${meta.date}
+	 */	
+	public List<${meta.domainClassName}> selectModelByExample(${meta.domainClassName} record);
 	
-	/**更新一条记录*/
-	public void updateByPrimaryKey(${meta.domainClassName} vo);
+	/**
+	 * @Description:分页查询
+	 * @param vo 查询对象
+	 * @param page 分页对象
+	 * @return 分页对象
+	 * @author:${meta.user}
+	 * @Date:${meta.date}
+	 */
+	public Page<HashMap<String, Object>> selectByPage(${meta.domainClassName} vo, Page<HashMap<String, Object>> page);
 	
-	/**插入一条记录*/
-	public void insert(${meta.domainClassName} vo);
+	/**
+	 * @Description:根据主键查询
+	 * @param id 主键
+	 * @return 受影响的记录
+	 * @author:${meta.user}
+	 * @Date:${meta.date}
+	 */
+	public ${meta.domainClassName} selectByPrimaryKey(Long id);
 	
-	/**批量删除*/
-	public void deleteByIds(String ids);
+	/**
+	 * @Description:更新一条记录
+	 * @param vo 记录
+	 * @return 受影响的记录条数
+	 * @author:${meta.user}
+	 * @Date:${meta.date}
+	 */
+	public ${meta.domainClassName} updateByPrimaryKey(${meta.domainClassName} record);
+	
+	/**
+	 * @Description:更新一条记录
+	 * @param vo 记录
+	 * @return 插入的记录
+	 * @author:${meta.user}
+	 * @Date:${meta.date}
+	 */
+	public ${meta.domainClassName} insert(${meta.domainClassName} record);
+	
+	/**
+	 * @Description:删除多条记录
+	 * @param ids ids字符串，多个以【,】隔开
+	 * @return 受影响的记录条数
+	 * @author:${meta.user}
+	 * @Date:${meta.date}
+	 */
+	public int deleteByIds(String ids);
+	
+	/**
+	 * @Description:删除一条记录
+	 * @param id 主键
+	 * @return 受影响的记录条数
+	 * @author:${meta.user}
+	 * @Date:${meta.date}
+	 */
+	public int deleteByPrimaryKey(Long id);
 	
 }

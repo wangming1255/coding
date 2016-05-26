@@ -4,8 +4,10 @@ import ${meta.domainPackageName}.${meta.domainClassName};
 
 /**
  *VO，用于查询或传递信息
+ *@Author：${meta.user}
+ *@email：${meta.email}
+ *@Date:${meta.date}
  */
 public class ${meta.voClassName} extends ${meta.domainClassName} {
-
 	
 }
